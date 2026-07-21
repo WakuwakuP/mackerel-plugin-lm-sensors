@@ -1,0 +1,13 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+/mackerel-plugin-lm-sensors
+
+# Tests and coverage
+*.test
+*.out
+
+# Build artifacts
+/goxz
