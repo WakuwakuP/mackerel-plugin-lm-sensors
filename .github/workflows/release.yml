@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+
+      - name: Test
+        run: go test ./...
+
+      - name: Install goxz
+        run: go install github.com/Songmu/goxz/cmd/goxz@v0.10.1
+
+      - name: Build release archives
+        run: |
+          mkdir -p "dist/${GITHUB_REF_NAME}"
+          goxz \
+            -d "dist/${GITHUB_REF_NAME}" \
+            -n mackerel-plugin-lm-sensors \
+            -z \
+            -os linux \
+            -arch amd64,arm64 \
+            .
+
+      - name: Verify installer compatibility
+        run: |
+          set -eu
+          for arch in amd64 arm64; do
+            archive="dist/${GITHUB_REF_NAME}/mackerel-plugin-lm-sensors_linux_${arch}.zip"
+            test -f "$archive"
+
+            destination="verify/${arch}"
+            root="$destination/mackerel-plugin-lm-sensors_linux_${arch}"
+            mkdir -p "$destination"
+            unzip -q "$archive" -d "$destination"
+
+            test -x "$root/mackerel-plugin-lm-sensors"
+            test -f "$root/README.md"
+            test -f "$root/LICENSE"
+          done
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/${GITHUB_REF_NAME}"/*.zip \
+            --generate-notes \
+            --verify-tag

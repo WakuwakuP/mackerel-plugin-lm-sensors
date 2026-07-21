@@ -60,10 +60,16 @@ lm_sensors.<category>.<chip>_<feature>_<reading>.value
 
 ## Install
 
-リリースを公開した後は `mkr` でインストールできます。
+GitHub Releases から `mkr` でインストールできます。
 
 ```sh
 mkr plugin install wakuwakup/mackerel-plugin-lm-sensors
+```
+
+バージョンを固定する場合:
+
+```sh
+mkr plugin install wakuwakup/mackerel-plugin-lm-sensors@v0.1.0
 ```
 
 ## mackerel-agent.conf
@@ -87,10 +93,24 @@ go build ./...
 go test ./...
 ```
 
-クロスコンパイル用アーカイブは Docker を使って作成できます。
+[`mkr plugin install`](https://mackerel.io/ja/docs/entry/advanced/make-plugin-corresponding-to-installer) 対応の Linux 用 ZIP アーカイブは Docker を使って作成できます。
 
 ```sh
-./build.sh
+./build.sh v0.1.0
+```
+
+次のファイルが `dist/v0.1.0/` に生成されます。ZIP には実行権限付きのバイナリ、`README.md`、`LICENSE` が含まれます。
+
+```text
+mackerel-plugin-lm-sensors_linux_amd64.zip
+mackerel-plugin-lm-sensors_linux_arm64.zip
+```
+
+`vX.Y.Z` 形式のタグを push すると、GitHub Actions がテストとアーカイブ検証を行い、GitHub Release を自動作成します。
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
 ## License
