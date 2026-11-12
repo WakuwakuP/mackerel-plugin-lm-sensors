@@ -2,7 +2,7 @@
 
 set -eu
 
-GOLANG_VERSION=1.25.1
+GOLANG_VERSION=1.26.11
 GOXZ_VERSION=v0.10.1
 NAME=mackerel-plugin-lm-sensors
 RELEASE_VERSION=${1:-dev}
